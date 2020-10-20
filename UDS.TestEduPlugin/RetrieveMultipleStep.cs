@@ -16,7 +16,7 @@ namespace UDS.VoPlugin
            : base(typeof(RetrieveMultipleStep))
         {
             base.RegisteredEvents
-                .Add(new Tuple<int, string, string, Action<LocalPluginContext>>((int)PluginStage.PreOperation, "RetrieveMultiple",
+                .Add(new Tuple<int, string, string, Action<LocalPluginContext>>((int)PluginStage.PostOperation, "RetrieveMultiple",
                     "new_tocreatecontact",
                     PullThePlugin));
         }
@@ -30,7 +30,7 @@ namespace UDS.VoPlugin
             FetchExpression query = (FetchExpression)localContext.PluginExecutionContext.InputParameters["Query"];
 
             EntityCollection result = new EntityCollection();
-            result.Entities.Add(new Entity("new_tocreatecontact")
+            result.Entities.Add(new Entity()
             {
                 Attributes =
                 {
@@ -39,7 +39,7 @@ namespace UDS.VoPlugin
             });
 
             localContext.PluginExecutionContext.OutputParameters["BusinessEntityCollection"] = result;
-            var be = localContext.PluginExecutionContext.OutputParameters["BusinessEntityCollection"];
+            //var be = localContext.PluginExecutionContext.OutputParameters["BusinessEntityCollection"];
 
             //service.Update(result.Entities[0]);
             //string name = target.GetAttributeValue<string>("new_simpletext");
