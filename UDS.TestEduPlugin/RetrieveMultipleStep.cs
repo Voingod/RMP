@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace UDS.VoPlugin
 {
@@ -39,35 +40,42 @@ namespace UDS.VoPlugin
             });
 
             localContext.PluginExecutionContext.OutputParameters["BusinessEntityCollection"] = result;
-            //var be = localContext.PluginExecutionContext.OutputParameters["BusinessEntityCollection"];
 
-            //service.Update(result.Entities[0]);
+
+            var fetchExpression = localContext.PluginExecutionContext.InputParameters["Query"] as FetchExpression;
+            var fetchXmlToQueryExpressionRequest = new FetchXmlToQueryExpressionRequest()
+            {
+                FetchXml = fetchExpression.Query
+            };
+            var fetchXmlToQueryExpressionResponse = (FetchXmlToQueryExpressionResponse)service.Execute(fetchXmlToQueryExpressionRequest);
+
+
+
+            var res = ParseQueryData(query);
+
             //string name = target.GetAttributeValue<string>("new_simpletext");
-            //query["new_simpletext"] = "Test";
         }
+        private Tuple<string, string> ParseQueryData(FetchExpression fetchExpression)
+        {
+            XDocument parsedQuery = XDocument.Parse(fetchExpression.Query);
 
-        //private Tuple<string, string> ParseQueryData()
-        //{
-        //    XDocument parsedQuery = XDocument.Parse(_fetchExpression.Query);
+            Dictionary<string, string> requestParameters = parsedQuery
+                .Descendants("condition")
+                .Where(e =>
+                    e.Attribute("attribute") != null &&
+                    e.Attribute("operator") != null &&
+                    e.Attribute("value") != null &&
+                    String.Equals(e.Attribute("operator")?.Value, "eq", StringComparison.InvariantCultureIgnoreCase))
+                .ToDictionary(e => e.Attribute("attribute")?.Value, e => e.Attribute("value")?.Value);
 
-        //    Dictionary<string, string> requestParameters = parsedQuery
-        //        .Descendants("condition")
-        //        .Where(e =>
-        //            e.Attribute("attribute") != null &&
-        //            e.Attribute("operator") != null &&
-        //            e.Attribute("value") != null &&
-        //            String.Equals(e.Attribute("operator")?.Value, "eq", StringComparison.InvariantCultureIgnoreCase))
-        //        .ToDictionary(e => e.Attribute("attribute")?.Value, e => e.Attribute("value")?.Value);
-
-        //    if (requestParameters.TryGetValue(GlobalConfiguration.QueryName, out string queryName) &&
-        //        !string.IsNullOrEmpty(queryName) &&
-        //        requestParameters.TryGetValue(GlobalConfiguration.QueryParameters, out string queryParams))
-        //    {
-        //        queryParams = Encoding.UTF8.GetString(Convert.FromBase64String(queryParams));
-        //        return Tuple.Create(queryName, queryParams);
-        //    }
-
-        //    return null;
-        //}
+            if (requestParameters.TryGetValue("new_name", out string queryName) &&
+                !string.IsNullOrEmpty(queryName) &&
+                requestParameters.TryGetValue("new_name", out string queryParams))
+            {
+                queryParams = Encoding.UTF8.GetString(Convert.FromBase64String(queryParams));
+                return Tuple.Create(queryName, queryParams);
+            }
+            return null;
+        }
     }
 }
