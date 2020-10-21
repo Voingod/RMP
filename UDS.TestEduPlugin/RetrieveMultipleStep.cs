@@ -31,20 +31,28 @@ namespace UDS.VoPlugin
             FetchExpression query = (FetchExpression)localContext.PluginExecutionContext.InputParameters["Query"];
 
             EntityCollection result = new EntityCollection();
-            string name = ParseQueryData(query).Item1;
+            string name = ParseQueryData(query)?.Item1;
+            string parametrs = ParseQueryData(query)?.Item2;
+
             result.Entities.Add(new Entity()
             {
                 Attributes =
                 {
                     ["new_simpletext"]="Test",
-                    ["new_name"]=name
+                    ["new_queryname"]=name,
+                    ["new_queryparams"]=parametrs
                 }
             });
             localContext.PluginExecutionContext.OutputParameters["BusinessEntityCollection"] = result;
 
+            var methods = GetMethods(name, CreateContact);
+           
         }
         private Tuple<string, string> ParseQueryData(FetchExpression fetchExpression)
         {
+            string querySchemeName = "new_queryname";
+            string querySchemeParams = "new_queryparams";
+
             XDocument parsedQuery = XDocument.Parse(fetchExpression.Query);
 
             Dictionary<string, string> requestParameters = parsedQuery
@@ -56,14 +64,40 @@ namespace UDS.VoPlugin
                     String.Equals(e.Attribute("operator")?.Value, "eq", StringComparison.InvariantCultureIgnoreCase))
                 .ToDictionary(e => e.Attribute("attribute")?.Value, e => e.Attribute("value")?.Value);
 
-            if (requestParameters.TryGetValue("new_name", out string queryName) &&
+            if (requestParameters.TryGetValue(querySchemeName, out string queryName) &&
                 !string.IsNullOrEmpty(queryName) &&
-                requestParameters.TryGetValue("new_name", out string queryParams))
+                requestParameters.TryGetValue(querySchemeParams, out string queryParams))
             {
-                //queryParams = Encoding.UTF8.GetString(Convert.FromBase64String(queryParams));
+                if (queryParams.Length % 4 == 0)
+                    queryParams = Encoding.UTF8.GetString(Convert.FromBase64String(queryParams));
+                else
+                {
+                    queryParams = queryParams.Trim().Replace(" ", "+");
+                    queryParams = queryParams.PadRight(queryParams.Length + 4 - queryParams.Length % 4, '=');
+                    try
+                    {
+                        queryParams = Encoding.UTF8.GetString(Convert.FromBase64String(queryParams));
+                    }
+                    catch (FormatException)
+                    {
+                        queryParams = "None";
+                    }                    
+                }
                 return Tuple.Create(queryName, queryParams);
             }
             return null;
+        }
+        private Dictionary<string, Func<string, string>> GetMethods(string queryName, Func<string, string> create)
+        {
+            Dictionary<string, Func<string, string>> createContactParametrs = new Dictionary<string, Func<string, string>>
+            {
+                [queryName] = create
+            };
+            return createContactParametrs;
+        }
+        private string CreateContact(string queryParams)
+        {
+            return queryParams;
         }
     }
 }
