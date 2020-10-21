@@ -31,29 +31,17 @@ namespace UDS.VoPlugin
             FetchExpression query = (FetchExpression)localContext.PluginExecutionContext.InputParameters["Query"];
 
             EntityCollection result = new EntityCollection();
+            string name = ParseQueryData(query).Item1;
             result.Entities.Add(new Entity()
             {
                 Attributes =
                 {
-                    ["new_simpletext"]="Test"
+                    ["new_simpletext"]="Test",
+                    ["new_name"]=name
                 }
             });
-
             localContext.PluginExecutionContext.OutputParameters["BusinessEntityCollection"] = result;
 
-
-            var fetchExpression = localContext.PluginExecutionContext.InputParameters["Query"] as FetchExpression;
-            var fetchXmlToQueryExpressionRequest = new FetchXmlToQueryExpressionRequest()
-            {
-                FetchXml = fetchExpression.Query
-            };
-            var fetchXmlToQueryExpressionResponse = (FetchXmlToQueryExpressionResponse)service.Execute(fetchXmlToQueryExpressionRequest);
-
-
-
-            var res = ParseQueryData(query);
-
-            //string name = target.GetAttributeValue<string>("new_simpletext");
         }
         private Tuple<string, string> ParseQueryData(FetchExpression fetchExpression)
         {
@@ -72,7 +60,7 @@ namespace UDS.VoPlugin
                 !string.IsNullOrEmpty(queryName) &&
                 requestParameters.TryGetValue("new_name", out string queryParams))
             {
-                queryParams = Encoding.UTF8.GetString(Convert.FromBase64String(queryParams));
+                //queryParams = Encoding.UTF8.GetString(Convert.FromBase64String(queryParams));
                 return Tuple.Create(queryName, queryParams);
             }
             return null;
