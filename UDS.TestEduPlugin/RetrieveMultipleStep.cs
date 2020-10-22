@@ -31,8 +31,11 @@ namespace UDS.VoPlugin
             FetchExpression query = (FetchExpression)localContext.PluginExecutionContext.InputParameters["Query"];
 
             EntityCollection result = new EntityCollection();
-            string name = ParseQueryData(query)?.Item1;
-            string parametrs = ParseQueryData(query)?.Item2;
+
+            Tuple<string, string> data = ParseQueryData(query);
+
+            string name = data.Item1;
+            string parametrs = data.Item2;
 
             result.Entities.Add(new Entity()
             {
