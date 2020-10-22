@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,14 +20,9 @@ namespace ConsoleCRMApp
         static void Main(string[] args)
         {
 
-
-
-
-
-            var methods = GetMethods("CreateContact", CreateContact);
-
-
-            foreach (var item in methods)
+            CreateMethods createMethods = new CreateMethods();
+            createMethods.methods.Add("CreateStep", CreateStep);
+            foreach (var item in createMethods.methods)
             {
                 if (item.Key == "CreateContact")
                 {
@@ -75,20 +69,11 @@ namespace ConsoleCRMApp
             Console.ReadLine();
 
         }
-        static private Dictionary<string, Func<string, Entity>> GetMethods(string queryName, Func<string, Entity> create)
-        {
-            Dictionary<string, Func<string, Entity>> createContactParametrs = new Dictionary<string, Func<string, Entity>>
-            {
-                [queryName] = create
-            };
-            return createContactParametrs;
-        }
-        static private Entity CreateContact(string queryParams)
+        static private Entity CreateStep(string queryParams)
         {
             Console.WriteLine(queryParams);
             return new Entity();
         }
-
     }
 
 }

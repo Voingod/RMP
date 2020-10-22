@@ -44,9 +44,16 @@ namespace UDS.VoPlugin
                 }
             });
             localContext.PluginExecutionContext.OutputParameters["BusinessEntityCollection"] = result;
+                        
+            CreateMethods createMethods = new CreateMethods();
+            foreach (var item in createMethods.methods)
+            {
+                if (item.Key == name)
+                {
+                    service.Create(item.Value?.Invoke(parametrs));
+                }
+            }
 
-            var methods = GetMethods(name, CreateContact);
-           
         }
         private Tuple<string, string> ParseQueryData(FetchExpression fetchExpression)
         {
@@ -81,23 +88,12 @@ namespace UDS.VoPlugin
                     catch (FormatException)
                     {
                         queryParams = "None";
-                    }                    
+                    }
                 }
                 return Tuple.Create(queryName, queryParams);
             }
             return null;
         }
-        private Dictionary<string, Func<string, string>> GetMethods(string queryName, Func<string, string> create)
-        {
-            Dictionary<string, Func<string, string>> createContactParametrs = new Dictionary<string, Func<string, string>>
-            {
-                [queryName] = create
-            };
-            return createContactParametrs;
-        }
-        private string CreateContact(string queryParams)
-        {
-            return queryParams;
-        }
+
     }
 }
