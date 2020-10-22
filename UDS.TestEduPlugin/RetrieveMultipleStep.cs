@@ -41,19 +41,28 @@ namespace UDS.VoPlugin
             {
                 Attributes =
                 {
-                    ["new_simpletext"]="Test",
+                    ["new_simpletext"]="Create",
                     ["new_queryname"]=name,
                     ["new_queryparams"]=parametrs
                 }
             });
             localContext.PluginExecutionContext.OutputParameters["BusinessEntityCollection"] = result;
-                        
+
             CreateMethods createMethods = new CreateMethods();
             foreach (var item in createMethods.methods)
             {
                 if (item.Key == name)
                 {
-                    service.Create(item.Value?.Invoke(parametrs));
+                    Guid id = service.Create(item.Value?.Invoke(parametrs));
+                    result.Entities.Add(new Entity()
+                    {
+                        Attributes =
+                        {
+                            ["new_simpletext"]=id,
+                        }
+                    });
+                    localContext.PluginExecutionContext.OutputParameters["BusinessEntityCollection"] = result;
+                    break;
                 }
             }
 

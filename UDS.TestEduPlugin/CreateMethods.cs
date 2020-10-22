@@ -16,9 +16,11 @@ namespace UDS.VoPlugin
         }
         private Entity CreateContact(string queryParams)
         {
+            Random random = new Random();
+            
             Entity contact = new Entity("contact");
-            contact["lastname"] = "FirstName";
-            contact["firstname"] = "SecondName";
+            contact["lastname"] = "Surname_" + random.Next(0, 500);
+            contact["firstname"] = "Name_" + random.Next(0, 500); 
             contact["parentcustomerid"] = new EntityReference("account", new Guid(queryParams));
             return contact;
         }
