@@ -20,26 +20,24 @@ namespace ConsoleCRMApp
     {
         static void Main(string[] args)
         {
-            string queryParams = "ZXJnZmhmZ";
 
 
-            if (queryParams.Length % 4 == 0)
-                queryParams = Encoding.UTF8.GetString(Convert.FromBase64String(queryParams));
-            else
+
+
+
+            var methods = GetMethods("CreateContact", CreateContact);
+
+
+            foreach (var item in methods)
             {
-                queryParams = queryParams.Trim().Replace(" ", "+");
-                queryParams = queryParams.PadRight(queryParams.Length + 4 - queryParams.Length % 4, '=');
-                queryParams = Encoding.UTF8.GetString(Convert.FromBase64String("ZXJnZmhmZ=="));
+                if (item.Key == "CreateContact")
+                {
+                    item.Value.Invoke("does it work?");
+                }
             }
 
 
-
-
-
-
-            var qwe = GetParametrs("qwe", CreateContact);
-            var req = qwe["qwe"]?.Invoke("testqwewqewqewqe");
-            Console.WriteLine(queryParams);
+            //Console.WriteLine(queryParams);
             //OrganizationServiceProxy serviceProxy = ConnectHelper.CrmService;
             //var service = (IOrganizationService)serviceProxy;
             //serviceProxy.ServiceConfiguration.CurrentServiceEndpoint.Behaviors.Add(new ProxyTypesBehavior());
@@ -77,18 +75,20 @@ namespace ConsoleCRMApp
             Console.ReadLine();
 
         }
-        private static Dictionary<string, Func<string, string>> GetParametrs(string queryName, Func<string, string> create)
+        static private Dictionary<string, Func<string, Entity>> GetMethods(string queryName, Func<string, Entity> create)
         {
-            Dictionary<string, Func<string, string>> createContactParametrs = new Dictionary<string, Func<string, string>>
+            Dictionary<string, Func<string, Entity>> createContactParametrs = new Dictionary<string, Func<string, Entity>>
             {
                 [queryName] = create
             };
             return createContactParametrs;
         }
-        private static string CreateContact(string queryParams)
+        static private Entity CreateContact(string queryParams)
         {
-            return queryParams;
+            Console.WriteLine(queryParams);
+            return new Entity();
         }
+
     }
 
 }
