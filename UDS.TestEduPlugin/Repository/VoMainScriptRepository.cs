@@ -51,20 +51,5 @@ namespace UDS.VoPlugin.Repository
             var records = _service.RetrieveMultiple(query);
             return records.Entities;
         }
-
-
-
-
-    }
-    public class CustomEntity
-    {
-        public int VoSriptState { get; set; }
-        public DateTime? VoScriptData { get; set; }
-        public Guid? VoScriptId { get; set; }
-        public EntityReference VoScriptAcc { get; set; }
-        public string VoScriptName { get; set; }
-        public Guid? VoTwoId { get; set; }
-        public EntityReference VoTwoAcc { get; set; }
-        public string VoTwoIdName { get; set; }
     }
 }

@@ -101,7 +101,11 @@
   <ItemGroup>
     <Compile Include="CreateMethods.cs" />
     <Compile Include="Message.cs" />
-    <Compile Include="Repository\VoMainScriptDeactivateRepository.cs" />
+    <Compile Include="Repository\CaseRepository.cs" />
+    <Compile Include="Repository\TeamRepository.cs" />
+    <Compile Include="Repository\UsersRepository.cs" />
+    <Compile Include="Services\AssignCaseService.cs" />
+    <Compile Include="Steps\CaseCreateStep.cs" />
     <Compile Include="Steps\RetrieveMultipleStep.cs" />
     <Compile Include="Services\DeactivateService.cs" />
     <Compile Include="Repository\VoMainScriptRepository.cs" />
