@@ -17,31 +17,33 @@ namespace UDS.VoPlugin.Services
             _service = service;
         }
 
-        public KeyValuePair<AliasedValue, int> GetOwner(OptionSetValue caseOrigin)
+        public Guid GetOwner(OptionSetValue caseOriginCode)
         {
             TeamRepository teamRepository = new TeamRepository(_service);
-            Entity team = teamRepository.GetTeams(caseOrigin.Value).Entities[0];
-            EntityReference teamEntity = (EntityReference)team["new_team"];
+            Entity team = teamRepository.GetTeams(caseOriginCode.Value).Entities.FirstOrDefault();
+
+            if (team == null)
+            {
+                return new Guid();
+            }
+
+            EntityReference teamEntityId = team.GetAttributeValue<EntityReference>("new_team");
 
             UsersRepository usersRepository = new UsersRepository(_service);
-            var users = usersRepository.GetUsers(teamEntity.Id);
+
+            var users = usersRepository.GetUsers(teamEntityId.Id);
 
             CaseRepository caseRepository = new CaseRepository(_service);
 
-            Dictionary<AliasedValue, int> keyValuePairs = new Dictionary<AliasedValue, int>();
+            Guid? newOwner = caseRepository.GetCasesCountByUsers(users);
 
-            for (int i = 0; i < users.Count; i++)
+            if (newOwner == null)
             {
-                AliasedValue id = (AliasedValue)users[i].Attributes["systemuser2.systemuserid"];
-                int count = caseRepository.GetCasesCountByUsers(id.Value.ToString());
-                keyValuePairs.Add(id, count);
+                throw new InvalidPluginExecutionException("Doesn't have E-mail");
             }
 
-            int minValue = keyValuePairs.Values.Min();
+            return newOwner == null ? users.FirstOrDefault().Id : (Guid)newOwner;
 
-            var newOwner = keyValuePairs.Where(q => q.Value == minValue).FirstOrDefault();
-
-            return newOwner;
         }
 
     }

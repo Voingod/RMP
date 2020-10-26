@@ -13,8 +13,8 @@ namespace UDS.VoPlugin.Repository
         private IOrganizationService _service;
 
 
-        private const string FirstEntityName = "team";
-        private const string SecondEntityName = "systemuser";
+        private const string FirstEntityName = "systemuser";
+        private const string SecondEntityName = "team";
         private const string LinkEntityName = "teammembership";
         public UsersRepository(IOrganizationService service)
         {
@@ -24,23 +24,23 @@ namespace UDS.VoPlugin.Repository
         {
             var query = new QueryExpression(FirstEntityName)
             {
-                ColumnSet = new ColumnSet("name"),
-                Criteria = new FilterExpression()
-                {
-                    Conditions =
-                  {
-                      new ConditionExpression("teamid",ConditionOperator.Equal,teamId)
-                  }
-                },
+                ColumnSet = new ColumnSet("fullname", "systemuserid"),
                 LinkEntities =
                 {
-                  new LinkEntity(FirstEntityName, LinkEntityName, "teamid", "teamid", JoinOperator.Inner)
+                    new LinkEntity(FirstEntityName, LinkEntityName, "systemuserid", "systemuserid", JoinOperator.Inner)
                   {
                       LinkEntities =
                       {
-                        new LinkEntity(LinkEntityName, SecondEntityName, "systemuserid", "systemuserid", JoinOperator.Inner)
+                        new LinkEntity(LinkEntityName, SecondEntityName, "teamid", "teamid", JoinOperator.Inner)
                         {
-                            Columns = new ColumnSet("fullname","systemuserid"),
+                            Columns = new ColumnSet("name"),
+                            LinkCriteria = new FilterExpression()
+                            {
+                                  Conditions =
+                                  {
+                                      new ConditionExpression("teamid",ConditionOperator.Equal,teamId)
+                                  }
+                            },
                         }
                       }
                   }

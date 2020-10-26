@@ -18,21 +18,47 @@ namespace UDS.VoPlugin.Repository
         {
             _service = service;
         }
-        public int GetCasesCountByUsers(string owner)
+        public Guid? GetCasesCountByUsers(DataCollection<Entity> owner)
         {
             var query = new QueryExpression(FirstEntityName)
             {
-                ColumnSet = new ColumnSet(true),
-                Criteria = new FilterExpression(LogicalOperator.Or)
-                {
-                    Conditions =
-                  {
-                      new ConditionExpression("ownerid",ConditionOperator.Equal,owner)
-                  }
-                }
+                ColumnSet = new ColumnSet("ownerid"),
+                Criteria = new FilterExpression(LogicalOperator.Or) { }
             };
-            var records = _service.RetrieveMultiple(query);
-            return records.Entities.Count;
+
+            Conditions(ref query, owner);
+
+            var recordsAll = _service.RetrieveMultiple(query);
+                
+            var records = recordsAll.Entities.GroupBy(u => u.Attributes["ownerid"])
+                .Select(s => new
+                {
+                    MetricKey = (EntityReference)s.Key,
+                    MetricCount = s.Count(),
+
+                }).ToList();
+
+            var ownerId = records.Where(q => q.MetricCount == records.Min(a => a.MetricCount)).FirstOrDefault();
+
+            if (ownerId == null)
+            {
+                throw new InvalidPluginExecutionException("Doesn't have E-mail");
+                return null;
+            }
+            else
+            {
+                return ownerId.MetricKey.Id;
+            }
+
+        }
+
+        public QueryExpression Conditions(ref QueryExpression query, DataCollection<Entity> owner)
+        {
+            for (int i = 0; i < owner.Count; i++)
+            {
+                query.Criteria.AddCondition("ownerid", ConditionOperator.Equal, owner[i].Id);
+            }
+            return query;
         }
 
     }

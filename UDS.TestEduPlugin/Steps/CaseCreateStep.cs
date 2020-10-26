@@ -22,29 +22,28 @@ namespace UDS.VoPlugin.Steps
         }
         protected void CreateStep(LocalPluginContext localContext)
         {
-            if (!localContext.PluginExecutionContext.InputParameters.Contains("Target"))
-            {
-                return;
-            }
+
             Entity target = (Entity)localContext.PluginExecutionContext.InputParameters["Target"];
+            OptionSetValue caseOriginCode = target.GetAttributeValue<OptionSetValue>("caseorigincode");
 
-
-            if (!target.Attributes.Contains("caseorigincode"))
+            if (caseOriginCode == null)
             {
                 return;
             }
-
-            OptionSetValue caseOrigin = (OptionSetValue)target["caseorigincode"];
 
             IOrganizationService service = localContext.OrganizationService;
             AssignCaseService assignCaseService = new AssignCaseService(service);
 
-            var newOwner = assignCaseService.GetOwner(caseOrigin);
+            var newOwner = assignCaseService.GetOwner(caseOriginCode);
+
+            localContext.Trace("AAAAAAAAAAAAAAAAAAAAAAAA");
+            localContext.Trace("ttttttttttttttt"+newOwner.ToString()+"ttttttttttttttttttttt");
 
             Entity entity = new Entity(target.LogicalName, target.Id);
-            entity["ownerid"] = new EntityReference("systemuser", new Guid(newOwner.Key.Value.ToString()));
+            entity["ownerid"] = new EntityReference("systemuser", newOwner);
             service.Update(entity);
 
+            //target["ownerid"] = new EntityReference("systemuser", newOwner);
 
         }
     }
