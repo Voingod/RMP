@@ -1,5 +1,4 @@
-﻿using CrmEarlyBound;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
 using System;
@@ -54,29 +53,7 @@ namespace UDS.VoPlugin.Repository
         }
 
 
-        public IQueryable<CustomEntity> EarlyBoundGetEntities(CrmServiceContext context)
-        {
-            var entities = (
-                from vo_script in context.new_vo_main_scriptSet
-                join vo_scriptTovo_two in context.new_new_vo_two_main_new_vo_main_scriptSet
-                on vo_script.new_vo_main_scriptId equals vo_scriptTovo_two.new_vo_main_scriptid
-                join vo_two in context.new_vo_two_mainSet
-                on vo_scriptTovo_two.new_vo_two_mainid equals vo_two.new_vo_two_mainId
-                //where DateTime.Now.Subtract(vo_script.CreatedOn.Value).Days > 2
-                //where vo_script.StateCode.Value == 0
-                select new CustomEntity
-                {
-                    VoSriptState = (int)vo_script.StateCode.Value,
-                    VoScriptData = vo_script.CreatedOn,
-                    VoScriptId = vo_script.new_vo_main_scriptId,
-                    VoScriptAcc = vo_script.new_account,
-                    VoScriptName = vo_script.new_name,
-                    VoTwoId = vo_two.new_vo_two_mainId,
-                    VoTwoAcc = vo_two.new_account,
-                    VoTwoIdName = vo_two.new_name,
-                });
-            return entities;
-        }
+
 
     }
     public class CustomEntity

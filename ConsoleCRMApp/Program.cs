@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using CrmEarlyBound;
 using KostenVoranSchlagConsoleParser.Helpers;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;

@@ -29,15 +29,6 @@ namespace UDS.VoPlugin
             Console.WriteLine(queryParams);
             return new Entity();
         }
-
-        //public Dictionary<string, Func<string, Entity>> AddMethod(string methodName, Func<string, Entity> methodAction)
-        //{
-        //    Dictionary<string, Func<string, Entity>> methods = new Dictionary<string, Func<string, Entity>>
-        //    {
-        //        [methodName] = methodAction
-        //    };
-        //    return methods;
-        //}
     }
 
 }

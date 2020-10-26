@@ -1,5 +1,4 @@
-﻿using CrmEarlyBound;
-using Microsoft.Crm.Sdk.Messages;
+﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
