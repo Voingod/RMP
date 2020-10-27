@@ -36,11 +36,8 @@ namespace UDS.VoPlugin.Steps
 
             var newOwner = assignCaseService.GetOwner(caseOriginCode);
 
-            localContext.Trace("AAAAAAAAAAAAAAAAAAAAAAAA");
-            localContext.Trace("ttttttttttttttt"+newOwner.ToString()+"ttttttttttttttttttttt");
-
             Entity entity = new Entity(target.LogicalName, target.Id);
-            entity["ownerid"] = new EntityReference("systemuser", newOwner);
+            entity["ownerid"] = new EntityReference("systemuser", newOwner.Key);
             service.Update(entity);
 
             //target["ownerid"] = new EntityReference("systemuser", newOwner);

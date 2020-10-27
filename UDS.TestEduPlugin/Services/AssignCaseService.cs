@@ -17,14 +17,14 @@ namespace UDS.VoPlugin.Services
             _service = service;
         }
 
-        public Guid GetOwner(OptionSetValue caseOriginCode)
+        public KeyValuePair<Guid, int> GetOwner(OptionSetValue caseOriginCode)
         {
             TeamRepository teamRepository = new TeamRepository(_service);
             Entity team = teamRepository.GetTeams(caseOriginCode.Value).Entities.FirstOrDefault();
 
             if (team == null)
             {
-                return new Guid();
+                return new KeyValuePair<Guid, int>();
             }
 
             EntityReference teamEntityId = team.GetAttributeValue<EntityReference>("new_team");
@@ -35,14 +35,20 @@ namespace UDS.VoPlugin.Services
 
             CaseRepository caseRepository = new CaseRepository(_service);
 
-            Guid? newOwner = caseRepository.GetCasesCountByUsers(users);
+            Dictionary<Guid, int> keyValuePairs = new Dictionary<Guid, int>();
 
-            if (newOwner == null)
+            for (int i = 0; i < users.Count; i++)
             {
-                throw new InvalidPluginExecutionException("Doesn't have E-mail");
+                Guid id = users[i].Id;
+                int count = caseRepository.GetCasesCountByUsers(id.ToString());
+                keyValuePairs.Add(id, count);
             }
 
-            return newOwner == null ? users.FirstOrDefault().Id : (Guid)newOwner;
+            int minValue = keyValuePairs.Values.Min();
+
+            var newOwner = keyValuePairs.Where(q => q.Value == minValue).FirstOrDefault();
+
+            return newOwner;
 
         }
 
