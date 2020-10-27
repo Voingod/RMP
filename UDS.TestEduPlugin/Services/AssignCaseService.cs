@@ -17,14 +17,14 @@ namespace UDS.VoPlugin.Services
             _service = service;
         }
 
-        public KeyValuePair<Guid, int> GetOwner(OptionSetValue caseOriginCode)
+        public Guid GetOwner(OptionSetValue caseOriginCode)
         {
             TeamRepository teamRepository = new TeamRepository(_service);
             Entity team = teamRepository.GetTeams(caseOriginCode.Value).Entities.FirstOrDefault();
 
             if (team == null)
             {
-                return new KeyValuePair<Guid, int>();
+                return new Guid();
             }
 
             EntityReference teamEntityId = team.GetAttributeValue<EntityReference>("new_team");
@@ -48,7 +48,7 @@ namespace UDS.VoPlugin.Services
 
             var newOwner = keyValuePairs.Where(q => q.Value == minValue).FirstOrDefault();
 
-            return newOwner;
+            return newOwner.Key;
 
         }
 

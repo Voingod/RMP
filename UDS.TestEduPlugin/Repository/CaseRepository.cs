@@ -20,19 +20,34 @@ namespace UDS.VoPlugin.Repository
         }
         public int GetCasesCountByUsers(string owner)
         {
-            var query = new QueryExpression(FirstEntityName)
-            {
-                ColumnSet = new ColumnSet(true),
-                Criteria = new FilterExpression(LogicalOperator.Or)
-                {
-                    Conditions =
-                  {
-                      new ConditionExpression("ownerid",ConditionOperator.Equal,owner)
-                  }
-                }
-            };
-            var records = _service.RetrieveMultiple(query);
-            return records.Entities.Count;
+            string fetch = @"
+                <fetch aggregate='true' >
+                  <entity name='incident' >
+                    <attribute name='caseorigincode' alias='caseorigincodesum' aggregate='count' />
+                    <filter type='and' >
+                      <condition attribute='ownerid' operator='in' >
+                        <value uitype='systemuser' >" + owner + "</value>" +
+                      "</condition>" +
+                      "<condition attribute='statecode' operator='eq' value='0' /> " +
+                    "</filter> " +
+                  "</entity> " +
+                "</fetch>";
+
+            //var query = new QueryExpression(FirstEntityName)
+            //{
+            //    ColumnSet = new ColumnSet(true),
+            //    Criteria = new FilterExpression(LogicalOperator.Or)
+            //    {
+            //        Conditions =
+            //      {
+            //          new ConditionExpression("ownerid",ConditionOperator.Equal,owner)
+            //      }
+            //    }
+            //};
+
+            var records = (AliasedValue)_service.RetrieveMultiple(new FetchExpression(fetch))
+                                                .Entities.FirstOrDefault()["caseorigincodesum"];
+            return (int)records.Value;
         }
 
     }
