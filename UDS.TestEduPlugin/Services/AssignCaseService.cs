@@ -24,7 +24,7 @@ namespace UDS.VoPlugin.Services
 
             if (team == null)
             {
-                return new Guid();
+                return Guid.Empty;
             }
 
             EntityReference teamEntityId = team.GetAttributeValue<EntityReference>("new_team");

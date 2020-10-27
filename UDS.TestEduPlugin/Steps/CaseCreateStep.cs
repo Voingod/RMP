@@ -36,7 +36,7 @@ namespace UDS.VoPlugin.Steps
 
             var newOwner = assignCaseService.GetOwner(caseOriginCode);
 
-            if (newOwner == new Guid())
+            if (newOwner == Guid.Empty)
             {
                 return;
             }

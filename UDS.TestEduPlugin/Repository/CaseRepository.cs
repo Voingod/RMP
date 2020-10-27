@@ -45,9 +45,10 @@ namespace UDS.VoPlugin.Repository
             //    }
             //};
 
-            var records = (AliasedValue)_service.RetrieveMultiple(new FetchExpression(fetch))
-                                                .Entities.FirstOrDefault()["caseorigincodesum"];
-            return (int)records.Value;
+            int records = (int)_service.RetrieveMultiple(new FetchExpression(fetch))
+                                                .Entities.FirstOrDefault()
+                                                .GetAttributeValue<AliasedValue>("caseorigincodesum").Value;
+            return records;
         }
 
     }
