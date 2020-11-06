@@ -113,6 +113,7 @@
     <Compile Include="Services\VoService.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Steps\RetrieveStep.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Lib\" />

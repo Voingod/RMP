@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.ServiceModel.Description;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -19,21 +20,35 @@ namespace ConsoleCRMApp
         static void Main(string[] args)
         {
 
-            CreateMethods createMethods = new CreateMethods();
-            createMethods.methods.Add("CreateStep", CreateStep);
-            foreach (var item in createMethods.methods)
-            {
-                if (item.Key == "CreateContact")
-                {
-                    item.Value.Invoke("does it work?");
-                }
-            }
-
-
-            //Console.WriteLine(queryParams);
             //OrganizationServiceProxy serviceProxy = ConnectHelper.CrmService;
             //var service = (IOrganizationService)serviceProxy;
             //serviceProxy.ServiceConfiguration.CurrentServiceEndpoint.Behaviors.Add(new ProxyTypesBehavior());
+
+            IOrganizationService organizationService = null;
+
+            try
+            {
+                ClientCredentials clientCredentials = new ClientCredentials();
+                clientCredentials.UserName.UserName = "trialadmindemo@udstrialsdemo40.onmicrosoft.com";
+                clientCredentials.UserName.Password = "EMsBRRH5k5txusuf";
+                
+                organizationService = (IOrganizationService)new OrganizationServiceProxy(new Uri("https://udstrialsdemo40.api.crm4.dynamics.com/XRMServices/2011/Organization.svc"),
+                    null,clientCredentials,null);
+
+                RetrieveRecordChangeHistoryRequest changeRequest = new RetrieveRecordChangeHistoryRequest();
+                changeRequest.Target = new EntityReference("account", new Guid("{B0B2DD8A-F30D-EB11-A813-000D3A666701}"));
+
+                RetrieveRecordChangeHistoryResponse changeResponse =
+                (RetrieveRecordChangeHistoryResponse)organizationService.Execute(changeRequest);
+
+                AuditDetailCollection details = changeResponse.AuditDetailCollection;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+
 
             #region Task14Testing
 
@@ -67,11 +82,6 @@ namespace ConsoleCRMApp
 
             Console.ReadLine();
 
-        }
-        static private Entity CreateStep(string queryParams)
-        {
-            Console.WriteLine(queryParams);
-            return new Entity();
         }
     }
 
